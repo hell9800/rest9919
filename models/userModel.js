@@ -2,10 +2,10 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  phone: { 
-    type: String, 
-    required: [true, 'Phone number is required'], 
-    unique: true,
+  phone: {
+     type: String,
+     required: [true, 'Phone number is required'],
+     unique: true,
     trim: true,
     match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number']
   },
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   age: {
     type: Number,
     required: [true, 'Age is required'],
-    min: [13, 'Minimum age is 13 years'],
+    min: [18, 'Minimum age is 18 years'], // Changed from 13 to 18
     max: [100, 'Maximum age is 100 years']
   },
   otp: {
@@ -30,16 +30,16 @@ const userSchema = new mongoose.Schema({
     type: Date,
     select: false
   },
-  consentGiven: { 
-    type: Boolean, 
-    default: false 
-  },
+  consentGiven: {
+     type: Boolean,
+     default: false
+   },
   isActive: {
     type: Boolean,
     default: true
   }
-}, { 
-  timestamps: true,
+}, {
+   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
@@ -56,6 +56,11 @@ userSchema.virtual('displayName').get(function() {
 // Method to check if OTP is valid
 userSchema.methods.isOTPValid = function(otp) {
   return this.otp === otp && this.otpExpiresAt > new Date();
+};
+
+// Additional method to check if user is adult
+userSchema.methods.isAdult = function() {
+  return this.age >= 18;
 };
 
 module.exports = mongoose.model("User", userSchema);
